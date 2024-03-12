@@ -1,23 +1,29 @@
-name: Development workflow
+name: Build and Deploy to GitHub Pages
 
 on: push
 
 jobs:
-  Build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Use node
-        uses: actions/setup-node@v1
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: 16.x
-      - name: Install
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install Dependencies
         run: npm ci
-      - name: Build
+
+      - name: Build Project
         run: npm run build
-      - name: Deploy
-        use: peaceiris/actions-gh-pages@v3
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
         with:
+          github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           publish_dir: ./build
-          github_token: ${{secrets.GITHUB_TOKEN}}
+          keep_files: false  # Set to true if you want to keep files already in the gh-pages branch
